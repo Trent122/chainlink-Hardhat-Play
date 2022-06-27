@@ -43,6 +43,8 @@ var (
 	DefaultQueryTimeout = 10 * time.Second
 	// LongQueryTimeout is a bigger upper bound for how long a SQL query should take
 	LongQueryTimeout = 1 * time.Minute
+	// UltraLongQueryTimeout is an even longer timeout, useful for reaping pipeline runs on high traffic chains
+	UltraLongQueryTimeout = 10 * time.Minute
 	// DefaultLockTimeout controls the max time we will wait for any kind of database lock.
 	// It's good to set this to _something_ because waiting for locks forever is really bad.
 	DefaultLockTimeout = 15 * time.Second

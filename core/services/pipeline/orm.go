@@ -335,9 +335,17 @@ func (o *orm) InsertFinishedRun(run *Run, saveSuccessfulTaskRuns bool, qopts ...
 // DeleteRunsOlderThan deletes all pipeline_runs that have been finished for a certain threshold to free DB space
 func (o *orm) DeleteRunsOlderThan(ctx context.Context, threshold time.Duration) error {
 	// Added 1 minute timeout to account for big databases
-	q := o.q.WithOpts(pg.WithParentCtx(ctx), pg.WithLongQueryTimeout())
+	q := o.q.WithOpts(pg.WithParentCtx(ctx), pg.WithUltraLongQueryTimeout())
 
 	queryThreshold := time.Now().Add(-threshold)
+
+	// TODO:  Instead of batching by counts, batch by timestamps?
+	//   for i = 10, 9, 8, 7, ... 0:
+	//      WHERE finished_at < now() - queryThresholdinto - i*time_step
+	//  where time_step = (queryThreshold - oldtest_job_time) / 10.0
+	//
+	// This eliminates the ORDER BY, allowing BRIN index to work much better
+
 	err := pg.Batch(func(_, limit uint) (count uint, err error) {
 		result, cancel, err := q.ExecQIter(`
 WITH batched_pipeline_runs AS (

@@ -76,6 +76,14 @@ func WithLongQueryTimeout() func(q *Q) {
 	}
 }
 
+// WithUltraLongQueryTimeout prevents the usage of the `DefaultQueryTimeout` duration and uses `TenMinuteQueryTimeout` instead
+// Presently, this is only needed for the reaper, since it may take a very long time to delete pipeline runs.
+func WithUltraLongQueryTimeout() func(q *Q) {
+	return func(q *Q) {
+		q.QueryTimeout = UltraLongQueryTimeout
+	}
+}
+
 // MergeCtx allows callers to combine a ctx with a previously set parent context
 // Responsibility for cancelling the passed context lies with caller
 func MergeCtx(fn func(parentCtx context.Context) context.Context) func(q *Q) {

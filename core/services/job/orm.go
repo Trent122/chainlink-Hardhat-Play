@@ -850,6 +850,7 @@ func (o *orm) FindPipelineRunIDsByJobID(jobID int32, offset, limit int) (ids []i
 SELECT pipeline_runs.id
 FROM pipeline_runs
 WHERE pipeline_runs.pipeline_spec_id = (SELECT jobs.pipeline_spec_id FROM JOBS WHERE jobs.id = $1)
+AND id >= (SELECT MAX(id) FROM pipeline_runs) - $2 - 1000
 ORDER BY pipeline_runs.created_at DESC, pipeline_runs.id DESC
 OFFSET $2
 LIMIT $3
